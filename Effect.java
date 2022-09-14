@@ -1,11 +1,8 @@
 public class Effect{
     String name;
-    public int duration;
-    public int expirationDate = 1;
-
+    public int expirationDate = 0;
     public Pokemon user;
     public Pokemon target;
-
     public Effect(){}
     public void activate(Pokemon user, Pokemon target){
         this.user = user;
@@ -21,83 +18,145 @@ public class Effect{
     }*/
 }
 
-class ChangeStage extends Effect{
-    String stat;
-    int stage;
-    boolean increase = false;
-    public ChangeStage(String stat, int stage){
-        this.stat = stat;
-        this.stage = stage;
-        if(stage > 0) increase = true;
+class Protection extends Effect{
+    public Protection(){ this.name = "damage nullifier"; }
+    @Override
+    public void activate(Pokemon user, Pokemon target){
+        boolean chance = Math.random() * 100 < (1.0 / user.protectCounter) * 100;
+        if(chance){
+            this.expirationDate = Main.turn + 1;
+            target.atkDmgMult = 0;
+            user.protectCounter *= 3;
+            super.activate(user, target);
+            Main.data.add(user.name + " is protected!");
+        }
+        else user.protectCounter = 1;
+    }
+    @Override
+    public void end(){
+        target.atkDmgMult = 1;
+        super.end();
+    }
+}
+
+class Confusion extends Effect{
+    int duration;
+    public Confusion(int duration){
+        this.duration = duration;
+        this.name = "confusion";
     }
     @Override
     public void activate(Pokemon user, Pokemon target){
-        this.expirationDate = Main.turn + 1;
-        if(stat.equals("speed")){ target.changeSpeed(stage); }
-        else if(stat.equals("attack")){ target.changeAttack(stage); }
-        else if(stat.equals("specialAttack")){ target.changeSpecialAttack(stage); }
-        else if(stat.equals("defense")){ target.changeDefense(stage); }
-        else if(stat.equals("specialDefense")){ target.changeSpecialDefense(stage); }
-        else if(stat.equals("accuracy")){ target.changeAccuracy(stage); }
+        this.expirationDate = Main.turn + duration;
+        user.confused = true;
+        Main.data.add(target.getName() + " is confused!");
+        super.activate(user, target);
+    }
+    @Override
+    public void end(){
+        target.confused = false;
+        super.end();
+    }
+}
+
+class ChangeStage extends Effect{
+    String stat;
+    int stage;
+    public ChangeStage(String stat, int stage){
+        this.stat = stat;
+        this.stage = stage;
+        this.name = "changeStage";
+    }
+    @Override
+    public void activate(Pokemon user, Pokemon target){
+        if(stage > 0) target = user; //This assumes decreases always negative and increases always positive
+        if(stat.equals("spd")){ target.changeSpeed(stage); }
+        else if(stat.equals("atk")){ target.changeAttack(stage); }
+        else if(stat.equals("spAtk")){ target.changeSpecialAttack(stage); }
+        else if(stat.equals("def")){ target.changeDefense(stage); }
+        else if(stat.equals("spDef")){ target.changeSpecialDefense(stage); }
+        else if(stat.equals("acc")){ target.changeAccuracy(stage); }
         String result = user.getName() + "'s " + stat + " was ";
-        if(increase) result += "increased!";
+        if(stage > 0) result += "increased!";
         else result += "decreased!";
         Main.data.add(result);
     }
 }
 
-class Poison extends Effect{
-    //Includes Leech, Burn, Poison
+class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
     double iteration = 1;
-    double denominator;
-    double attackDamageMultiplier = 1;
-    boolean bad;
-    boolean takeHealth;
-    public Poison(double denominator, double attackDamageMultiplier, boolean bad, boolean takeHealth){
-        this.denominator = denominator;
-        this.attackDamageMultiplier = attackDamageMultiplier;
-        this.bad = bad;
-        this.takeHealth = takeHealth;
+    double denominator = 8;
+    boolean badPoison;
+    boolean leech;
+    String command;
+    public Damage(String command){
         this.expirationDate = 100;
+        this.command = command;
+        this.name = command;
     }
     @Override
     public void activate(Pokemon user, Pokemon target){
-        target.attackDamageMultiplier = attackDamageMultiplier;
-        super.activate(user, target);
+        boolean fire = false;
+        boolean steelOrPoison = false;
+        for(int type : target.getType()){ if(type == 1){ fire = true; break; }
+        else if(type == 7 || type == 16){ steelOrPoison = true; break; } }
+        if(!(fire && command.equals("burn")
+                && !(steelOrPoison && (command.equals("poison") || command.equals("badPoison"))))){
+            if(command.equals("burn")){ target.atkDmgMult = 0.5; }
+            else if(command.equals("badPoison")){ denominator = 16; badPoison = true; }
+            else if(command.equals("leech")){ leech = true; }
+            super.activate(user, target);
+
+            String result = "";
+            if(command.equals("poison") || command.equals("badPoison")) result = user.name + " was poisoned!";
+            else if(command.equals("burn")) result = user.name + " was burned!";
+            Main.data.add(result);
+        }
+        else Main.data.add(target.name + " is immune to " + command + "!");
     }
     @Override
     public void update(){
         double value = (1.0 / denominator) * iteration;
-        value *= target.getBaseHealth();
-        target.health[1] -= value;
-        if(takeHealth) user.health[1] += value;
-        int percent = (int) ((value * 100) / target.health[0]);
+        value *= target.getBaseHp();
+        target.setHp(target.getHp() - value);
+        if(leech){ user.setHp(user.getHp() + value); }
+        if(badPoison) iteration++;
+
+        int percent = (int) ((value * 100) / target.getBaseHp());
         String result = target.name + " lost " + percent + "% of its health!";
         Main.data.add(result);
-        if(bad) iteration++;
     }
 }
 
-class Incapacitate extends Effect{
+class Incapacitate extends Effect{ //Includes Sleep, Paralyze, Rest
     String command;
+    double chance = 100; //Separate from effect accuracy
     public Incapacitate(String status){
         this.command = status;
         this.name = "incapacitation";
     }
     @Override
     public void activate(Pokemon user, Pokemon target){
-        if(command.equals("rest")) expirationDate = Main.turn + 2;
-        else if(command.equals("sleep")) expirationDate = Main.turn + ((int) (Math.random() * 7)) + 1;
-        target.canMove = false;
-        super.activate(user, target);
-        String result = "";
-        if(command.equals("sleep") || command.equals("rest")) result = user.name + " fell asleep!";
-        else if(command.equals("paralyze")) result = user.name + " was paralyzed!";
-        Main.data.add(result);
+        boolean electric = false;
+        for(int type : target.getType()){ if(type == 4){ electric = true; break; } }
+        if(!(electric && command.equals("paralyze"))){
+            if(command.equals("rest")){ expirationDate = Main.turn + 3; }
+            else if(command.equals("sleep")){ expirationDate = Main.turn + ((int) (Math.random() * 7)) + 1; }
+            else if(command.equals("paralyze")){ chance = 25; target.setSpd(target.getSpd() * 0.75); expirationDate = 100; }
+            if(Math.random() * 100 < chance){ target.canMove = false; }
+            super.activate(user, target);
+
+            String result = "";
+            if(command.equals("sleep") || command.equals("rest")){ result = target.name + " fell asleep!"; }
+            else if(command.equals("paralyze")){ result = target.name + " was paralyzed!"; }
+            Main.data.add(result);
+        }
+        else Main.data.add(target.name + " is immune to paralysis!");
     }
     @Override
     public void end(){
         target.canMove = true;
+        user.setSpd(user.getSpd());
         super.end();
     }
 }
@@ -108,18 +167,12 @@ class Recoil extends Effect{
     public Recoil(int percent, Attack attack){
         this.percent = percent;
         this.attack = attack;
-        name = "recoil";
-    }
-    @Override //NOTE TO SELF: Figure out why this cannot function in tandem with super class's activate
-    public void activate(Pokemon user, Pokemon target){
-        expirationDate = Main.turn + 1;
-        super.activate(user, target);
+        this.name = "recoil";
     }
     @Override
-    public void update(){
+    public void activate(Pokemon user, Pokemon target){
         double value = (percent * attack.damage) / 100;
-        target.health[1] -= value;
-        int percent = (int) ((value * 100) / target.health[0]);
+        target.setHp(target.getHp() - value);
         String result = target.name + " was damaged by recoil!";
         Main.data.add(result);
     }
