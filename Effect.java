@@ -28,7 +28,8 @@ class Protection extends Effect{
             target.atkDmgMult = 0;
             user.protectCounter *= 3;
             super.activate(user, target);
-            Main.data.add(user.name + " is protected!");
+            //Main.data.add(user.name + " is protected!");
+            Main.addData(user.name + " is protected!");
         }
         else user.protectCounter = 1;
     }
@@ -49,7 +50,8 @@ class Confusion extends Effect{
     public void activate(Pokemon user, Pokemon target){
         this.expirationDate = Main.turn + duration;
         user.confused = true;
-        Main.data.add(target.getName() + " is confused!");
+        //Main.data.add(target.getName() + " is confused!");
+        Main.addData(target.getName() + " is confused!");
         super.activate(user, target);
     }
     @Override
@@ -79,7 +81,8 @@ class ChangeStage extends Effect{
         String result = user.getName() + "'s " + stat + " was ";
         if(stage > 0) result += "increased!";
         else result += "decreased!";
-        Main.data.add(result);
+        //Main.data.add(result);
+        Main.addData(result);
     }
 }
 
@@ -110,9 +113,13 @@ class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
             String result = "";
             if(command.equals("poison") || command.equals("badPoison")) result = user.name + " was poisoned!";
             else if(command.equals("burn")) result = user.name + " was burned!";
-            Main.data.add(result);
+            //Main.data.add(result);
+            Main.addData(result);
         }
-        else Main.data.add(target.name + " is immune to " + command + "!");
+        else{
+            //Main.data.add(target.name + " is immune to " + command + "!");
+            Main.addData(target.name + " is immune to " + command + "!");
+        }
     }
     @Override
     public void update(){
@@ -124,7 +131,8 @@ class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
 
         int percent = (int) ((value * 100) / target.getBaseHp());
         String result = target.name + " lost " + percent + "% of its health!";
-        Main.data.add(result);
+        //Main.data.add(result);
+        Main.addData(result);
     }
 }
 
@@ -149,9 +157,13 @@ class Incapacitate extends Effect{ //Includes Sleep, Paralyze, Rest
             String result = "";
             if(command.equals("sleep") || command.equals("rest")){ result = target.name + " fell asleep!"; }
             else if(command.equals("paralyze")){ result = target.name + " was paralyzed!"; }
-            Main.data.add(result);
+            //Main.data.add(result);
+            Main.addData(result);
         }
-        else Main.data.add(target.name + " is immune to paralysis!");
+        else{
+            //Main.data.add(target.name + " is immune to paralysis!");
+            Main.addData(target.name + " is immune to paralysis!");
+        }
     }
     @Override
     public void end(){
@@ -174,6 +186,7 @@ class Recoil extends Effect{
         double value = (percent * attack.damage) / 100;
         target.setHp(target.getHp() - value);
         String result = target.name + " was damaged by recoil!";
-        Main.data.add(result);
+        //Main.data.add(result);
+        Main.addData(result);
     }
 }
