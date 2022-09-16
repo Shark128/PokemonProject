@@ -16,9 +16,10 @@ public class Attack{
     //public double effectAccuracy;
     public double damage = 0;
     public String result = "";
+    public String description = "";
 
     //Normal attack constructor
-    public Attack(String name, double power, double accuracy, double chanceOfCritical, int priority, int type){
+    public Attack(String name, double power, double accuracy, double chanceOfCritical, int priority, int type, String desc){
         this.name = name;
         this.power = power;
         this.accuracy = accuracy;
@@ -28,6 +29,7 @@ public class Attack{
         this.special = (type == 1 || type == 2 || type == 3 || type == 4
                 || type == 5 || type == 10 || type == 14 || type == 15);
         this.status = false;
+        description = desc;
     }
 
     public void addEffect(int effectAcc, Effect effect){
