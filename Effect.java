@@ -87,7 +87,7 @@ class ChangeStage extends Effect{
             case "acc":
                 target.changeAccuracy(stage);
         }
-        String result = user.getName() + "'s " + stat + " was ";
+        String result = target.getName() + "'s " + stat + " was ";
         if(stage > 0) result += "increased!";
         else result += "decreased!";
         //Main.data.add(result);
