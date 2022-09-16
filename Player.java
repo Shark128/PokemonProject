@@ -1,14 +1,13 @@
+import java.util.ArrayList;
 public class Player{
     public String name;
-    public Pokemon[] team;
+    public ArrayList<Pokemon> team = new ArrayList<>();
+    public Pokemon currentPokemon = null;
 
-    public Player(String name, boolean randomTeam){
-        this.name = name;
+    public Player(){}
 
-        if(randomTeam) generateTeam();
-    }
-
-    public void generateTeam(){
-
-    }
+    public void setName(String name){ this.name = name; }
+    public void setTeam(ArrayList<Pokemon> team){ this.team = team; }
+    public String getName(){ return this.name; }
+    public ArrayList<Pokemon> getTeam(){ return this.team; }
 }
