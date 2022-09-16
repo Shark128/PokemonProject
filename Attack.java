@@ -68,14 +68,16 @@ public class Attack{
 
         //Creating result
         int percent = (int) ((damage * 100) / opponent.getBaseHp());
-        /*String result = user.name + " used " + name + "!";
+        String result = user.name + " used " + name + "!";
         String effectiveness = "But it failed!";
         if(typeMultiplier == 0.5) effectiveness = "It's not very effective...";
-        if(typeMultiplier == 1) effectiveness = "It's effective!";
+        if(typeMultiplier == 1) effectiveness = "";
         if(typeMultiplier >= 2) effectiveness = "It's super effective!\n(" + opponent.name + " lost " + percent + "% of its health!)";
         if(critical == 2) effectiveness = effectiveness + "\nA critical hit!";
-        result = result + "\n" + effectiveness;*/
-        if(damage != 0){ result = opponent.name + " lost " + percent + "% of their health!"; this.result = result; }
+        result = result + "\n" + effectiveness;
+        if(damage == 0) result = user.name + " used " + name + "!";
+        Main.data.add(result);
+//         if(damage != 0){ result = opponent.name + " lost " + percent + "% of their health!"; this.result = result; }
     }
 
     //Uses attack
