@@ -11,13 +11,7 @@ public class Effect{
     }
     public void update(){}
     public void end(){ target.effects.remove(this); }
-    /*public void recordResult(int value){
-        int percent = (int) ((value * 100) / target.health[0]);
-        String result = target.name + " lost " + percent + "% of its health from " + name;
-        Main.data.add(result);
-    }*/
 }
-
 class Protection extends Effect{
     public Protection(){ this.name = "damage nullifier"; }
     @Override
@@ -28,7 +22,6 @@ class Protection extends Effect{
             target.atkDmgMult = 0;
             user.protectCounter *= 3;
             super.activate(user, target);
-            //Main.data.add(user.name + " is protected!");
             Main.addData(user.name + " is protected!");
         }
         else user.protectCounter = 1;
@@ -39,7 +32,6 @@ class Protection extends Effect{
         super.end();
     }
 }
-
 class Confusion extends Effect{
     int duration;
     public Confusion(int duration){
@@ -50,7 +42,6 @@ class Confusion extends Effect{
     public void activate(Pokemon user, Pokemon target){
         this.expirationDate = Main.turn + duration;
         user.confused = true;
-        //Main.data.add(target.getName() + " is confused!");
         Main.addData(target.getName() + " is confused!");
         super.activate(user, target);
     }
@@ -60,7 +51,6 @@ class Confusion extends Effect{
         super.end();
     }
 }
-
 class ChangeStage extends Effect{
     String stat;
     int stage;
@@ -72,28 +62,18 @@ class ChangeStage extends Effect{
     @Override
     public void activate(Pokemon user, Pokemon target){
         if(stage > 0) target = user; //This assumes decreases always negative and increases always positive
-        switch (stat) {
-            case "spd":
-                target.changeSpeed(stage);
-            case "atk":
-                target.changeAttack(stage);
-            case "spAtk":
-                target.changeSpecialAttack(stage);
-            case "def":
-                target.changeDefense(stage);
-            case "spDef":
-                target.changeSpecialDefense(stage);
-            case "acc":
-                target.changeAccuracy(stage);
-        }
+        if(stat.equals("spd")){ target.changeSpeed(stage); }
+        else if(stat.equals("atk")){ target.changeAttack(stage); }
+        else if(stat.equals("spAtk")){ target.changeSpecialAttack(stage); }
+        else if(stat.equals("def")){ target.changeDefense(stage); }
+        else if(stat.equals("spDef")){ target.changeSpecialDefense(stage); }
+        else if(stat.equals("acc")){ target.changeAccuracy(stage); }
         String result = user.getName() + "'s " + stat + " was ";
         if(stage > 0) result += "increased!";
         else result += "decreased!";
-        //Main.data.add(result);
         Main.addData(result);
     }
 }
-
 class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
     double iteration = 1;
     double denominator = 8;
@@ -104,11 +84,9 @@ class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
         this.expirationDate = 100;
         this.command = command;
         this.name = command;
-        System.out.println("POISON TEST 1");
     }
     @Override
     public void activate(Pokemon user, Pokemon target){
-        System.out.println("POISON TEST 2");
         boolean fire = false;
         boolean steelOrPoison = false;
         for(int type : target.getType()){ if(type == 1){ fire = true; break; }
@@ -118,20 +96,13 @@ class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
             if(command.equals("burn")){ target.atkDmgMult = 0.5; }
             else if(command.equals("badPoison")){ denominator = 16; badPoison = true; }
             else if(command.equals("leech")){ leech = true; }
-
-
             String result = "";
             if(command.equals("poison") || command.equals("badPoison")) result = user.name + " was poisoned!";
             else if(command.equals("burn")) result = user.name + " was burned!";
-            //Main.data.add(result);
             Main.addData(result);
-
             super.activate(user, target);
         }
-        else{
-            //Main.data.add(target.name + " is immune to " + command + "!");
-            Main.addData(target.name + " is immune to " + command + "!");
-        }
+        else{ Main.addData(target.name + " is immune to " + command + "!"); }
     }
     @Override
     public void update(){
@@ -140,14 +111,11 @@ class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
         target.setHp(target.getHp() - value);
         if(leech){ user.setHp(user.getHp() + value); }
         if(badPoison) iteration++;
-
         int percent = (int) ((value * 100) / target.getBaseHp());
         String result = target.name + " lost " + percent + "% of its health!";
-        //Main.data.add(result);
         Main.addData(result);
     }
 }
-
 class Incapacitate extends Effect{ //Includes Sleep, Paralyze, Rest
     String command;
     double chance = 100; //Separate from effect accuracy
@@ -165,17 +133,12 @@ class Incapacitate extends Effect{ //Includes Sleep, Paralyze, Rest
             else if(command.equals("paralyze")){ chance = 25; target.setSpd(target.getSpd() * 0.75); expirationDate = 100; }
             if(Math.random() * 100 < chance){ target.canMove = false; }
             super.activate(user, target);
-
             String result = "";
             if(command.equals("sleep") || command.equals("rest")){ result = target.name + " fell asleep!"; }
             else if(command.equals("paralyze")){ result = target.name + " was paralyzed!"; }
-            //Main.data.add(result);
             Main.addData(result);
         }
-        else{
-            //Main.data.add(target.name + " is immune to paralysis!");
-            Main.addData(target.name + " is immune to paralysis!");
-        }
+        else{ Main.addData(target.name + " is immune to paralysis!"); }
     }
     @Override
     public void end(){
@@ -184,7 +147,6 @@ class Incapacitate extends Effect{ //Includes Sleep, Paralyze, Rest
         super.end();
     }
 }
-
 class Recoil extends Effect{
     int percent;
     Attack attack;
@@ -198,7 +160,6 @@ class Recoil extends Effect{
         double value = (percent * attack.damage) / 100;
         target.setHp(target.getHp() - value);
         String result = target.name + " was damaged by recoil!";
-        //Main.data.add(result);
         Main.addData(result);
     }
 }
