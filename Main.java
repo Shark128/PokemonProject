@@ -3,65 +3,30 @@ import java.util.Scanner;
 public class Main{
     public static Player[] players = new Player[]{new Player(), new Player()};
     public static Player winner = new Player();
-    
     public static boolean gameOver = false;
     public static int turn = 0;
     public static ArrayList<String> data = new ArrayList<>();
     public static String gameplayType = "none";
-
     public static boolean[][] playerOptions = new boolean[][]{{true, true, true, true}, {true, true, true, true}};
+
     public static void main(String[] args){
-        /**
-         * IMPORTANT!!
-         * IMPORTANT!!
-         * In this new system, the skeleton of effects are added to attacks, and when the attacks are used, the effects
-         * are properly initialized with their user and target. For the effect to activate, the pokemon must be updated.
-         * IMPORTANT!!
-         * IMPORTANT!!
-         */
-        
-        //ArrayList<String> test = squeezeText(27, );
-        //for(String x : list2) System.out.println(x.length());
-        /*String text1 = "testing this thing I hope it works";
-        String text2 = "veryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryVeryLongWord extraWord";
-        ArrayList<String> test = squeezeText(27, text2);
-        //String[] test = getCleanedString(27, text2).split(" ");
-        for(String x : test){ System.out.println(x); }*/
-        
-        //System.out.println(Main.data.toString());
-        /*for(Pokemon x : Pokemon.pokedex){
-            for(Attack y : x.attacks){
-                System.out.println(y.type);
-            }
-        }
-        for(Player x : players){
-            for(Pokemon y : x.getTeam()){
-                System.out.println(y.getName());
-            }
-        }*/
-        //Pokemon.pokedex = Pokemon.getPokedex();
-        
         boolean doMainLoop = true;
         while(doMainLoop){
             System.out.println("THE ULTIMATE DELUXE PREMIUM BOOTLEG POKEMON GAME EXPERIENCE SIMULATOR LIMITED TIME");
             System.out.println("Modes:\n(1) Player Versus Player\n(2) Player Versus Computer");
             int choice = new Scanner(System.in).nextInt();
             if(choice == 1){
-                generateTeams(3, 1);
+                generateTeams(6, 6);
                 gameplayType = "PVP";
                 gameplay();
             }
             else if(choice == 2){
                 generateTeams(3, 1);
-                //PVE_Gameplay();
                 gameplayType = "PVE";
                 gameplay();
             }
         }
-
-
     }
-
     public static void gameplay(){
         //Initializing everything
         System.out.print("Player 1, please enter your name: ");
@@ -74,16 +39,13 @@ public class Main{
         }
         else{ players[1].setName("THE_COMPUTER"); }
         update();
-
         //Actual gameplay
         while(!gameOver){
             Main.turn++;
             String header = "[ TURN " + Main.turn + " ]";
             addData(header);
-            //Variable storage
             Attack[] attacks = new Attack[]{null, null};
             Pokemon[] substitutes = new Pokemon[]{null, null};
-
             //Getting player input
             for(int player = 0; player <= 1; player++){
                 if(!gameOver){
@@ -100,47 +62,34 @@ public class Main{
                         String printOptions = "Options:";
                         for(int i = 0; i < 4; i++){ if(playerOptions[player][i]) printOptions += options[i]; }
                         System.out.println(printOptions);
-                        //System.out.println("Options: (1) Attack (2) Switch (3) Use Item (4) Forfeit");
                         choice = new Scanner(System.in).nextInt();
                     }
                     else{ choice = 1; }
-
-                    /**STORING USER INPUT*/
+                    /**CHOICE = ATTACK*/
                     if(choice == 1){
-                        if(player == 0 || gameplayType.equals("PVP")){
-                            attacks[player] = getAttack(players[player]);
-                        }
-                        else{
-                            //int random = ((int) (Math.random() * 4));
-                            attacks[player] = players[1].currentPokemon.attacks[((int) (Math.random() * 4))];
-                        }
-                        System.out.println("\n\n\n\n\nTESTESTESTESTESTEST: Player " + players[player].getName() + " chose " + attacks[player].name);
+                        if(player == 0 || gameplayType.equals("PVP")){ attacks[player] = getAttack(players[player]); }
+                        else{ attacks[player] = players[1].currentPokemon.attacks[((int) (Math.random() * 4))]; }
                     }
-                    else if(choice == 2){
-                        substitutes[player] = getSubstitute(players[player]);
-                    }
+                    /**CHOICE = SWITCH*/
+                    else if(choice == 2){ substitutes[player] = getSubstitute(players[player]); }
+                    /**CHOICE = USE ITEM*/
                     else if(choice == 3){
-                        //System.out.println("USING AN ITEM");
                         System.out.println("Select number of item to use:");
                         for(int i = 0; i < players[player].currentPokemon.items.size(); i++){
-                            System.out.println("(" + (i + 1) + ") " + players[player].currentPokemon.items.get(i).name);
-                        }
+                            System.out.println("(" + (i + 1) + ") " + players[player].currentPokemon.items.get(i).name); }
                         int itemChoice = new Scanner(System.in).nextInt();
                         itemChoice--;
                         Item item = players[player].currentPokemon.items.get(itemChoice);
                         if(item.name.equals("Poke Ball")){
-                            if(player == 0){
-                                item.usePokeball(players[0], players[1]);
-                            }
+                            if(player == 0){ item.usePokeball(players[0], players[1]); }
                             else{ item.usePokeball(players[1], players[0]); }
                         }
                         else{
-                            if(player == 0){
-                                item.use(players[0].currentPokemon, players[1].currentPokemon);
-                            }
+                            if(player == 0){ item.use(players[0].currentPokemon, players[1].currentPokemon); }
                             else{ item.use(players[1].currentPokemon, players[0].currentPokemon); }
                         }
                     }
+                    /**CHOICE = FORFEIT*/
                     else if(choice == 4){
                         System.out.print("Are you sure you want to forfeit?");
                         String forfeit = new Scanner(System.in).nextLine();
@@ -151,9 +100,12 @@ public class Main{
                             gameOver = true;
                         }
                     }
-                    //a
                 }
             }
+            /**PERFORMING ACTIONS
+             * It is important to note that attacks, effects and substitutions are used after both players have gone,
+             * in order to account for players' priority and speed similar variables
+             * */
             if(!gameOver){
                 //Performing substitutions
                 for(int i = 0; i <= 1; i++){
@@ -172,21 +124,16 @@ public class Main{
                         if(attacks[1].priority > attacks[0].priority) first = 1;
                         else if(players[1].currentPokemon.getSpd() > players[0].currentPokemon.getSpd()) first = 1;
                         else if(Math.random() < 0.5) first = 1;
-
                         if(first == 0){ attacks[0].use(players[0].currentPokemon, players[1].currentPokemon); }
                         else{ attacks[1].use(players[1].currentPokemon, players[0].currentPokemon); }
-
                         if(first == 0 && players[1].currentPokemon.getHp() > 0){
-                            attacks[1].use(players[1].currentPokemon, players[0].currentPokemon);
-                        }
+                            attacks[1].use(players[1].currentPokemon, players[0].currentPokemon); }
                         else if(first == 1 && players[0].currentPokemon.getHp() > 0){
-                            attacks[0].use(players[0].currentPokemon, players[1].currentPokemon);
-                        }
+                            attacks[0].use(players[0].currentPokemon, players[1].currentPokemon); }
                     }
                     else if(attacks[0] != null){ attacks[0].use(players[0].currentPokemon, players[1].currentPokemon); }
                     else{ attacks[1].use(players[1].currentPokemon, players[0].currentPokemon); }
                 }
-                //UPDATING GAME
                 update();
             }
         }
@@ -253,33 +200,15 @@ public class Main{
      * Used to create the graphics that show the battle
      * */
     public static String[][] getScreen(Player player, Player otherPlayer){
-        //Pokemon pokemon = Pokemon.pokedex.get(0);
-        /*
-
-        DATA SCREEN:
-        40 < x < 55     (b1 = 40, b2 = 54)
-
-        ATTACK SCREEN:
-        rows - 10 < y
-        Attacks are 10 width
-
-        */
         int rows = 30;
         int columns = 55;
         int border = 1;
-
         int attackScreenY = rows - 11;
         int attackScreenX = border;
         int dataScreenY = border;
         int dataScreenX = columns - 11;
         String[][] screen = new String[rows][columns];
-
-        for(int i = 0; i < rows; i++){
-            for(int j = 0; j < columns; j++){
-                screen[i][j] = " * ";
-            }
-        }
-
+        for(int i = 0; i < rows; i++){ for(int j = 0; j < columns; j++){ screen[i][j] = " * "; } }
         for(int i = border; i < rows - border; i++){
             for(int j = border; j < columns - border; j++){
                 screen[i][j] = "   ";
@@ -287,10 +216,6 @@ public class Main{
                 if(j % 11 == 0 && i >= attackScreenY && j < 44){ screen[i][j] = " * "; } //Horizontal attack borders
                 if(j == dataScreenX) screen[i][j] = " * "; //Vertical data border
                 if(j > dataScreenX) screen[i][j] = " @ ";
-
-                //Player's pokemon lists
-                //if((j == border + 6) && i < attackScreenY) screen[i][j] = " * ";
-                //if((j == dataScreenX - 7) && i < attackScreenY) screen[i][j] = " * ";
                 if(((j == border + 6) || (j == dataScreenX - 7)) && i < attackScreenY) screen[i][j] = " * ";
                 if(i == border + 1 && ((j < border + 6) || (j > dataScreenX - 7 && j < dataScreenX))) screen[i][j] = " * ";
                 String header1 = players[0] + "'s Pokemon:";
@@ -306,19 +231,16 @@ public class Main{
                     int index;
                     int start = localX * 3;
                     int end = start + 3;
-
                     if(j < 11) index = 0;
                     else if(j < 22) index = 1;
                     else if(j < 33) index = 2;
                     else index = 3;
-
                     ArrayList<String> attackString = player.currentPokemon.attacks[index].getString();
                     if(localY < attackString.size()) screen[i][j] = attackString.get(localY).substring(start, end) + "";
                     else screen[i][j] = "   ";
                 }
             }
         }
-
         int shift = 7;
         //Current Player's Pokemon Info
         ArrayList<String> chunk1 = player.currentPokemon.getString(true);
@@ -360,9 +282,7 @@ public class Main{
                 else screen[i][j] = "   ";
             }
         }
-
         //Player 1 Pokemon List
-        //Note to self: Make max length of user input 18
         String header = "Player One:       ";
         ArrayList<String> list1 = new ArrayList<>();
         for(Pokemon x : players[0].getTeam()){
@@ -407,12 +327,30 @@ public class Main{
                 }
             }
         }
+        //Sad, basic coloring
+        for(int i = 0; i < rows; i++){
+            for(int j = 0; j < columns; j++){
+                if(screen[i][j].equals(" * ")){ screen[i][j] = Color.get("BG", 5) + "   " + Color.reset(); }
+                else if((((j < border + 6 || j > dataScreenX - 7) || i > attackScreenY)
+                        && (i >= border && i < rows - border))
+                        || ((i >= border && i < border + 3 && j >= border + 7 && j < border + 20))
+                        || (i >= attackScreenY - 3 && i < attackScreenY && j >= dataScreenX - 20 && j < dataScreenX - 7)){
+                    screen[i][j] = Color.get("BG", 10) + screen[i][j] + Color.reset();
+                }
+                else{ screen[i][j] = Color.get("BG", 20) + screen[i][j] + Color.reset(); }
+                screen[i][j] = Color.get("FG", 0, 0, 0) + screen[i][j] + Color.reset();
+            }
+        }
+
         return screen;
     }
     public static ArrayList<String> squeezeText(int width, String text){
         text = getCleanedString(width, text); //Processing text so nothing is too long
         String space = "                                                                     ".substring(0, width);
         String[] list = text.split(" ");
+
+
+
         ArrayList<String> newList = new ArrayList<>();
         String line = "";
         int length = 0;
@@ -438,6 +376,23 @@ public class Main{
         }
 
         newList.add(line + space.substring(0, width - line.length()));
+
+        //testing color
+        /*System.out.println("Test A");
+        for(int i = 0; i < newList.size(); i++){
+            System.out.println("Test B");
+            String x = newList.get(i);
+            String y = "";
+            if(x.equals("Fire") || x.equals("Electric")){
+                System.out.println("Test C");
+                y = Color.get("BG", 5, 0, 0) + x + Color.reset();
+            }
+            if(y.length() != 0){ newList.set(i, "no"); }
+        }
+        for(String x : newList){
+            String[] split = x.split(" ");
+
+        }*/
         /*System.out.println("TEST");
         for(String x : newList){
             System.out.println(x);
@@ -466,13 +421,14 @@ public class Main{
         return string;
     }
     public static void printScreen(String[][] screen){
+        //System.out.print(Color.get("FG", 20));
         for(String[] x : screen){
             for(String y : x){
                 System.out.print(y);
-                if(y.length() > 54) System.out.println("\n\nTEST" + y.length() + "\n\n");
             }
             System.out.print("\n");
         }
+        //System.out.print(Color.reset());
     }
     /**MISCELLANEOUS METHODS
      * These methods do not fit into any of the previous categories but are nonetheless vital
@@ -502,7 +458,6 @@ public class Main{
         for(int player = 0; player <= 1; player++){
             for(Pokemon x : players[player].getTeam()){
                 Item item = Item.itemdex.get((int) (Math.random() * Item.itemdex.size()));
-                System.out.println("added " + item.name + " to " + x.getName());
                 x.items.add(item);
             }
         }
