@@ -327,21 +327,19 @@ public class Main{
                 }
             }
         }
-        //Sad, basic coloring
         for(int i = 0; i < rows; i++){
             for(int j = 0; j < columns; j++){
-                if(screen[i][j].equals(" * ")){ screen[i][j] = Color.get("BG", 5) + "   " + Color.reset(); }
+                if(screen[i][j].equals(" * ")){ screen[i][j] = "\u001B[48;5;250m" + "   " + "\u001B[0m"; }
                 else if((((j < border + 6 || j > dataScreenX - 7) || i > attackScreenY)
                         && (i >= border && i < rows - border))
                         || ((i >= border && i < border + 3 && j >= border + 7 && j < border + 20))
                         || (i >= attackScreenY - 3 && i < attackScreenY && j >= dataScreenX - 20 && j < dataScreenX - 7)){
-                    screen[i][j] = Color.get("BG", 10) + screen[i][j] + Color.reset();
+                    screen[i][j] = "\u001B[48;5;245m" + screen[i][j] + "\u001B[0m";
                 }
-                else{ screen[i][j] = Color.get("BG", 20) + screen[i][j] + Color.reset(); }
-                screen[i][j] = Color.get("FG", 0, 0, 0) + screen[i][j] + Color.reset();
+                else{ screen[i][j] = "\u001B[48;5;235m" + screen[i][j] + "\u001B[0m"; }
+                screen[i][j] = "\u001B[38;5;0m" + screen[i][j] + "\u001B[0m";
             }
         }
-
         return screen;
     }
     public static ArrayList<String> squeezeText(int width, String text){
@@ -421,14 +419,14 @@ public class Main{
         return string;
     }
     public static void printScreen(String[][] screen){
-        //System.out.print(Color.get("FG", 20));
+        
         for(String[] x : screen){
             for(String y : x){
                 System.out.print(y);
             }
             System.out.print("\n");
         }
-        //System.out.print(Color.reset());
+       
     }
     /**MISCELLANEOUS METHODS
      * These methods do not fit into any of the previous categories but are nonetheless vital
