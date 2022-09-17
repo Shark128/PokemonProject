@@ -7,14 +7,14 @@ public class Attack{
     public double chanceOfCritical;
     public int priority;
     public int type;
-    
+
     public ArrayList<Effect> effectList = new ArrayList<>();
     public ArrayList<Integer> effectAccList = new ArrayList<>();
     public double damage = 0;
     public String result = "";
     public String description = "";
     public String type2 = "Physical";
-    
+
     public Attack(String name, double power, double accuracy, double chanceOfCritical, int priority, int type, String desc){
         this.name = name;
         this.power = power;
