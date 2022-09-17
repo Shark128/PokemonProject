@@ -7,17 +7,14 @@ public class Attack{
     public double chanceOfCritical;
     public int priority;
     public int type;
-
-
+    
     public ArrayList<Effect> effectList = new ArrayList<>();
     public ArrayList<Integer> effectAccList = new ArrayList<>();
-    //public double effectAccuracy;
     public double damage = 0;
     public String result = "";
     public String description = "";
     public String type2 = "Physical";
-
-    //Normal attack constructor
+    
     public Attack(String name, double power, double accuracy, double chanceOfCritical, int priority, int type, String desc){
         this.name = name;
         this.power = power;
@@ -38,7 +35,7 @@ public class Attack{
 
     //Sets damage
     public void initialize(Pokemon user, Pokemon opponent){
-        System.out.println("THIS.TYPE: " + this.type + "    OPPONENT.TYPE: " + opponent.type[0]);
+        //System.out.println("THIS.TYPE: " + this.type + "    OPPONENT.TYPE: " + opponent.type[0]);
         //Initializing damage modifiers
         accuracy *= user.getAcc();
         int critical = 1;
@@ -82,10 +79,10 @@ public class Attack{
         String effectiveness = "But it failed!";
         if(typeMultiplier == 0.5) effectiveness = "It's not very effective...";
         if(typeMultiplier == 1) effectiveness = "";
-        if(typeMultiplier >= 2) effectiveness = "It's super effective!\n(" + opponent.name + " lost " + percent + "% of its health!)";
+        if(typeMultiplier >= 2) effectiveness = "It's super effective!";
         if(effectiveness.length() > 0) result.add(effectiveness);
         if(critical == 2) result.add("A critical hit!");
-        result.add("(" + opponent.name + " lost " + percent + "% of their health!)");
+        result.add("(" + opponent.name + " lost " + percent + "% of its health!)");
         String result2 = "";
         for(String x : result) result2 += x + " ";
         this.result = result2;
