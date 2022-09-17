@@ -6,7 +6,12 @@ public class Main{
     public static boolean gameOver = false;
     public static int turn = 0;
     public static ArrayList<String> data = new ArrayList<>();
-    public static String gameplayType = "none";
+    enum gameType{
+        PVP,
+        PVE,
+        NONE
+    }
+    public static gameType gameplayType = gameType.NONE;
     public static boolean[][] playerOptions = new boolean[][]{{true, true, true, true}, {true, true, true, true}};
 
     public static void main(String[] args){
@@ -17,12 +22,12 @@ public class Main{
             int choice = new Scanner(System.in).nextInt();
             if(choice == 1){
                 generateTeams(6, 6);
-                gameplayType = "PVP";
+                gameplayType = gameType.PVP;
                 gameplay();
             }
             else if(choice == 2){
                 generateTeams(3, 1);
-                gameplayType = "PVE";
+                gameplayType = gameType.PVE;
                 gameplay();
             }
         }
@@ -32,7 +37,7 @@ public class Main{
         System.out.print("Player 1, please enter your name: ");
         String player1Name = new Scanner(System.in).nextLine();
         players[0].setName(player1Name);
-        if(gameplayType.equals("PVP")){
+        if(gameplayType == gameType.PVP){
             System.out.print("Player 2, please enter your name: ");
             String player2Name = new Scanner(System.in).nextLine();
             players[1].setName(player2Name);
@@ -52,7 +57,7 @@ public class Main{
                     /**PRINTING SCREEN AND GETTING USER INPUT*/
                     //This makes sure that if the user is playing against the computer, the user's screen does not change
                     int choice = -1;
-                    if(player == 0 || gameplayType.equals("PVP")){
+                    if(player == 0 || gameplayType == gameType.PVP){
                         String[][] screen = new String[1][1];
                         if(player == 0){ screen = getScreen(players[0], players[1]); }
                         else{ screen = getScreen(players[1], players[0]); }
@@ -67,7 +72,7 @@ public class Main{
                     else{ choice = 1; }
                     /**CHOICE = ATTACK*/
                     if(choice == 1){
-                        if(player == 0 || gameplayType.equals("PVP")){ attacks[player] = getAttack(players[player]); }
+                        if(player == 0 || gameplayType == gameType.PVP){ attacks[player] = getAttack(players[player]); }
                         else{ attacks[player] = players[1].currentPokemon.attacks[((int) (Math.random() * 4))]; }
                     }
                     /**CHOICE = SWITCH*/
@@ -161,7 +166,7 @@ public class Main{
                 }
             }
         }
-        if(gameOver){ gameplayType = "none"; }
+        if(gameOver){ gameplayType = gameType.NONE; }
     }
     public static void smallUpdate(){
         for(int player = 0; player <= 1; player++){
@@ -306,7 +311,7 @@ public class Main{
         }
         //Player 2 Pokemon List
         header = "Player Two:       ";
-        if(gameplayType.equals("PVE")){ header = "Computer:         "; }
+        if(gameplayType == gameType.PVE){ header = "Computer:         "; }
         ArrayList<String> list2 = new ArrayList<>();
         for(Pokemon x : players[1].getTeam()){
             String name = x.getName();
