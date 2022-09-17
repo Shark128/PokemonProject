@@ -375,26 +375,7 @@ public class Main{
 
         newList.add(line + space.substring(0, width - line.length()));
 
-        //testing color
-        /*System.out.println("Test A");
-        for(int i = 0; i < newList.size(); i++){
-            System.out.println("Test B");
-            String x = newList.get(i);
-            String y = "";
-            if(x.equals("Fire") || x.equals("Electric")){
-                System.out.println("Test C");
-                y = Color.get("BG", 5, 0, 0) + x + Color.reset();
-            }
-            if(y.length() != 0){ newList.set(i, "no"); }
-        }
-        for(String x : newList){
-            String[] split = x.split(" ");
-
-        }*/
-        /*System.out.println("TEST");
-        for(String x : newList){
-            System.out.println(x);
-        }*/
+      
         return newList;
     }
     public static String getCleanedString(int width, String text){
