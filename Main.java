@@ -43,7 +43,7 @@ public class Main{
 
         System.out.println(Main.data.toString());
         Pokemon.pokedex = Pokemon.getPokedex();
-        generateTeams(6);
+        generateTeams(1);
 
         for(Pokemon x : Pokemon.pokedex){
             for(Attack y : x.attacks){
@@ -89,7 +89,11 @@ public class Main{
 
                 printScreen(screen);
                 //Prompting response
-                System.out.println("Options: (1) Attack (2) Switch (3) Use Item (4) Forfeit");
+                String[] options = new String[]{" (1) Attack ", " (2) Switch ", " (3) Use Item ", " (4) Forfeit "};
+                String printOptions = "Options:";
+                for(int i = 0; i < 4; i++){ if(playerOptions[player][i]) printOptions += options[i]; }
+                System.out.println(printOptions);
+                //System.out.println("Options: (1) Attack (2) Switch (3) Use Item (4) Forfeit");
                 int choice = new Scanner(System.in).nextInt();
                 //Recording response
                 if(choice == 1){
@@ -135,34 +139,66 @@ public class Main{
                         if(first == 0){ attacks[0].use(players[0].currentPokemon, players[1].currentPokemon); }
                         else{ attacks[1].use(players[1].currentPokemon, players[0].currentPokemon); }
 
-
-                        if(first == 0 && !didPlayerLose(players[1])){
+                        if(first == 0 && players[1].currentPokemon.getHp() > 0){
                             attacks[1].use(players[1].currentPokemon, players[0].currentPokemon);
                         }
-                        else if(first == 1 && !didPlayerLose(players[0])){
+                        else if(first == 1 && players[0].currentPokemon.getHp() > 0){
                             attacks[0].use(players[0].currentPokemon, players[1].currentPokemon);
-                        }
-                        else if(first == 0 && didPlayerLose(players[1])){
-                            addData(players[0].getName() + " won!");
-                            gameOver = true;
-                        }
-                        else if(first == 1 && didPlayerLose(players[0])){
-                            addData(players[1].getName() + " won!");
-                            gameOver = true;
                         }
                     }
                     else if(attacks[0] != null){ attacks[0].use(players[0].currentPokemon, players[1].currentPokemon); }
                     else{ attacks[1].use(players[1].currentPokemon, players[0].currentPokemon); }
                 }
                 //UPDATING GAME
-                
+                update();
             }
-
         }
+        printScreen(getScreen(players[0], players[1]));
     }
-    
+
     public static void update(){
-        
+        //Updating basic game over
+        for(int player = 0; player <= 1; player++){
+            if(didPlayerLose(players[player])){
+                System.out.println("A");
+                if(player == 0) Main.addData(players[1].getName() + " won!");
+                else Main.addData(players[0].getName() + " won!");
+                gameOver = true;
+                break;
+            }
+        }
+        //Updating effects
+        if(!gameOver){
+            for(Pokemon x : players[0].getTeam()){ x.update(); }
+            for(Pokemon x : players[1].getTeam()){ x.update(); }
+
+            for(int player = 0; player <= 1; player++){
+                if(didPlayerLose(players[player])){
+                    System.out.println("B");
+                    if(player == 0) Main.addData(players[1].getName() + " won!");
+                    else Main.addData(players[0].getName() + " won!");
+                    gameOver = true;
+                    break;
+                }
+            }
+            //Updating Options
+            if(!gameOver){
+                playerOptions[0] = new boolean[]{true, true, true, true};
+                playerOptions[1] = new boolean[]{true, true, true, true};
+                for(int player = 0; player <= 1; player++){
+                    if(players[player].currentPokemon.getHp() == 0){
+                        System.out.println("C");
+                        //attack, switch, use item, forfeit
+                        //playerOptions[player] = new boolean[]{false, true, false, true};
+                        playerOptions[player][0] = false;
+                        playerOptions[player][2] = false;
+                    }
+                    if(!players[player].currentPokemon.getCanMove()){
+                        playerOptions[player][0] = false;
+                    }
+                }
+            }
+        }
     }
 
     public static Attack getAttack(Player player){
@@ -190,7 +226,7 @@ public class Main{
                 System.out.print("Please type the name of your substitute: ");
                 String pokemonName = new Scanner(System.in).nextLine();
                 for(Pokemon x : player.getTeam()){ if(x.getName().equals(pokemonName)){ newPokemon = x; break; } }
-                if(!newPokemon.fainted){ doLoop = false; }
+                if(newPokemon.getHp() > 0){ doLoop = false; }
                 else{ System.out.println("Unable to use unconscious Pokemon."); newPokemon = null; }
             }
         }
@@ -199,7 +235,7 @@ public class Main{
 
     public static boolean didPlayerLose(Player player){
         boolean playerLost = true;
-        for(Pokemon x : player.getTeam()){ if(!x.fainted){ playerLost = false; break; } }
+        for(Pokemon x : player.getTeam()){ if(x.getHp() > 0){ playerLost = false; break; } }
         return playerLost;
     }
 
@@ -238,6 +274,13 @@ public class Main{
                 if(j % 11 == 0 && i >= attackScreenY && j < 44){ screen[i][j] = " * "; } //Horizontal attack borders
                 if(j == dataScreenX) screen[i][j] = " * "; //Vertical data border
                 if(j > dataScreenX) screen[i][j] = " @ ";
+
+                //Player's pokemon lists
+                //if((j == border + 6) && i < attackScreenY) screen[i][j] = " * ";
+                //if((j == dataScreenX - 7) && i < attackScreenY) screen[i][j] = " * ";
+                if(((j == border + 6) || (j == dataScreenX - 7)) && i < attackScreenY) screen[i][j] = " * ";
+                if(i == border + 1 && ((j < border + 6) || (j > dataScreenX - 7 && j < dataScreenX))) screen[i][j] = " * ";
+                String header1 = players[0] + "'s Pokemon:";
             }
         }
         //Printing attacks
@@ -262,11 +305,13 @@ public class Main{
                 }
             }
         }
+
+        int shift = 7;
         //Current Player's Pokemon Info
         ArrayList<String> chunk1 = player.currentPokemon.getString(true);
         for(int i = border; i < border + 3; i++){
-            for(int j = border; j < border + 13; j++){
-                int localX = j - border;
+            for(int j = border + shift; j < border + 13 + shift; j++){
+                int localX = j - (border + shift);
                 int localY = i - border;
                 int start = localX * 3;
                 int end = start + 3;
@@ -276,8 +321,8 @@ public class Main{
         //Other Player's Pokemon Info
         ArrayList<String> chunk2 = otherPlayer.currentPokemon.getString(false);
         for(int i = attackScreenY - 3; i < attackScreenY; i++){
-            for(int j = dataScreenX - 13; j < dataScreenX; j++){
-                int localX = j - (dataScreenX - 13);
+            for(int j = dataScreenX - 13 - shift; j < dataScreenX - shift; j++){
+                int localX = j - (dataScreenX - 13 - shift);
                 int localY = i - (attackScreenY - 3);
                 int start = localX * 3;
                 int end = start + 3;
@@ -287,12 +332,9 @@ public class Main{
         //Data column
         for(int i = border; i < rows - border; i++){
             for(int j = dataScreenX + 1; j < columns - border; j++){
-                //FIX THIS SO IT CONSISTENTLY WORKS
                 //Updating Main.data
                 for(int k = 0; k < Main.data.size(); k++){
                     String space = "                                                                 ".substring(0, 27);
-                    //THIS LINE RIGHT HERE IS WHERE ERRORS HAPPEN. WHEN LINES ARE LONGER THAN 27 IT CREATES A NEGATIVE
-                    //END INDEX. FIND WAY TO BREAK UP LINES BUT KEEP SAME ORGANIZATION OF DATA
                     Main.data.set(k, Main.data.get(k) + space.substring(0, 27 - Main.data.get(k).length()));
                 }
                 while(Main.data.size() > 28){ Main.data.remove(0); }
@@ -305,6 +347,30 @@ public class Main{
                 else screen[i][j] = "   ";
             }
         }
+        //Player 1 Pokemon List
+        ArrayList<String> list1 = new ArrayList<>();
+        for(Pokemon x : players[0].getTeam()){
+            String tag = " (unconscious)";
+            if(x.getHp() == 0){ list1.add(x.getName() + tag); }
+            else{ list1.add(x.getName()); }
+        }
+        int index = 0;
+        for(int i = border; i < attackScreenY; i++){
+            for(int j = border; j < border + 6; j++){
+                int localX = j - border;
+                int localY = i - border;
+                int start = localX * 3;
+                int end = start + 3;
+                //screen[i][j] = list1.get(localY).substring(start, end);
+                screen[i][j] = localY + "   ".substring(0, 3 - (localY + "").length());
+                if(localY % 2 == 0 && localY > 5){
+                    list1.get(index);
+                    screen[i][j] = "!!!";
+                }
+            }
+        }
+        //Player 2 Pokemon List
+
         return screen;
     }
 
@@ -372,7 +438,13 @@ public class Main{
     }
 
     public static void printScreen(String[][] screen){
-        for(String[] x : screen){ for(String y : x){ System.out.print(y); } System.out.print("\n"); }
+        for(String[] x : screen){
+            for(String y : x){
+                System.out.print(y);
+                if(y.length() > 55) System.out.println("\n\nTEST" + y.length() + "\n\n");
+            }
+            System.out.print("\n");
+        }
     }
 
     public static void generateTeams(int teamSize){
