@@ -29,7 +29,7 @@ public class Pokemon{
     public ArrayList<Effect> effects = new ArrayList<>();
     public Attack[] attacks = new Attack[4];
 
-    boolean fainted = false;
+    //boolean fainted = false;
     public int owner = 0;
 
     public Pokemon(String name, double hp, double spd, double atk, double spAtk, double def, double spDef,
@@ -64,7 +64,7 @@ public class Pokemon{
         //Removing expired effects
         for(int i = 0; i < effects.size(); i++){
             if(effects.get(i).expirationDate == Main.turn){
-                System.out.println(this.name + "'s " + effects.get(i).name + " expired");
+                //System.out.println(this.name + "'s " + effects.get(i).name + " expired");
                 effects.get(i).end();
                 i = -1;
             }
@@ -132,7 +132,7 @@ public class Pokemon{
         this.hp[1] = hp;
         if(hp < 0){
             this.hp[1] = 0;
-            this.fainted = true;
+            //this.fainted = true;
             Main.addData(this.getName() + " fainted!");
         }
         //System.out.println(owner.name);
