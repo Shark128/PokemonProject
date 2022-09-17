@@ -12,7 +12,7 @@ public class Main{
     public static int turn = 0;
     public static ArrayList<String> data = new ArrayList<>();
 
-    public static final String dataSpace = "                       ";
+    public static String gameplayType = "none";
 
     public static boolean[][] playerOptions = new boolean[][]{{true, true, true, true}, {true, true, true, true}};
     public static void main(String[] args){
@@ -41,9 +41,8 @@ public class Main{
 
 
 
-        System.out.println(Main.data.toString());
-        Pokemon.pokedex = Pokemon.getPokedex();
-        generateTeams(1);
+        //System.out.println(Main.data.toString());
+
 
         for(Pokemon x : Pokemon.pokedex){
             for(Attack y : x.attacks){
@@ -56,23 +55,45 @@ public class Main{
                 System.out.println(y.getName());
             }
         }
+        Pokemon.pokedex = Pokemon.getPokedex();
+        boolean doMainLoop = true;
+        while(doMainLoop){
+            System.out.println("THE ULTIMATE DELUXE PREMIUM BOOTLEG POKEMON GAME EXPERIENCE SIMULATOR LIMITED TIME");
+            System.out.println("Modes:\n(1) Player Versus Player\n(2) Player Versus Computer");
+            int choice = new Scanner(System.in).nextInt();
+            if(choice == 1){
+                generateTeams(3, 1);
+                gameplayType = "PVP";
+                gameplay();
+            }
+            else if(choice == 2){
+                generateTeams(3, 1);
+                //PVE_Gameplay();
+                gameplayType = "PVE";
+                gameplay();
+            }
+        }
 
+
+    }
+
+    public static void gameplay(){
+        //Initializing everything
         System.out.print("Player 1, please enter your name: ");
         String player1Name = new Scanner(System.in).nextLine();
         players[0].setName(player1Name);
-        System.out.print("Player 2, please enter your name: ");
-        String player2Name = new Scanner(System.in).nextLine();
-        players[1].setName(player2Name);
-        PVP_Gameplay();
-    }
+        if(gameplayType.equals("PVP")){
+            System.out.print("Player 2, please enter your name: ");
+            String player2Name = new Scanner(System.in).nextLine();
+            players[1].setName(player2Name);
+        }
+        else{
+            players[1].setName("THE_COMPUTER");
+        }
 
-    public static void PVP_Gameplay(){
-        //Forfeit, attack, use item, switch
-        //Attack[] attacks = new Attack[]{null, null};
-        //boolean player1Forfeit = false;
-        //boolean player2Forfeit = false;
 
-        while(!gameOver){ //Printing game
+        //Actual gameplay
+        while(!gameOver){
             Main.turn++;
             String header = "[ TURN " + Main.turn + " ]";
             addData(header);
@@ -80,25 +101,40 @@ public class Main{
             Attack[] attacks = new Attack[]{null, null};
             Pokemon[] substitutes = new Pokemon[]{null, null};
 
+            //Getting player input
             for(int player = 0; player <= 1; player++){
-                //currentPlayer = player;
-                //Printing screen
-                String[][] screen = new String[1][1];
-                if(player == 0){ screen = getScreen(players[0], players[1]); }
-                else{ screen = getScreen(players[1], players[0]); }
 
-                printScreen(screen);
-                //Prompting response
-                String[] options = new String[]{" (1) Attack ", " (2) Switch ", " (3) Use Item ", " (4) Forfeit "};
-                String printOptions = "Options:";
-                for(int i = 0; i < 4; i++){ if(playerOptions[player][i]) printOptions += options[i]; }
-                System.out.println(printOptions);
-                //System.out.println("Options: (1) Attack (2) Switch (3) Use Item (4) Forfeit");
-                int choice = new Scanner(System.in).nextInt();
-                //Recording response
+
+                /**PRINTING SCREEN AND GETTING USER INPUT*/
+                //This makes sure that if the user is playing against the computer, the user's screen does not change
+                int choice = -1;
+                if(player == 0 || gameplayType.equals("PVP")){
+                    String[][] screen = new String[1][1];
+                    if(player == 0){ screen = getScreen(players[0], players[1]); }
+                    else{ screen = getScreen(players[1], players[0]); }
+                    printScreen(screen);
+
+                    String[] options = new String[]{" (1) Attack ", " (2) Switch ", " (3) Use Item ", " (4) Forfeit "};
+                    String printOptions = "Options:";
+                    for(int i = 0; i < 4; i++){ if(playerOptions[player][i]) printOptions += options[i]; }
+                    System.out.println(printOptions);
+                    //System.out.println("Options: (1) Attack (2) Switch (3) Use Item (4) Forfeit");
+                    choice = new Scanner(System.in).nextInt();
+                }
+                else{
+                    choice = 1;
+                }
+
+                //Recording input
                 if(choice == 1){
-                    attacks[player] = getAttack(players[player]);
-                    System.out.println("Player " + player + " chose " + attacks[player].name);
+                    if(player == 0 || gameplayType.equals("PVP")){
+                        attacks[player] = getAttack(players[player]);
+                    }
+                    else{
+                        //int random = ((int) (Math.random() * 4));
+                        attacks[player] = players[1].currentPokemon.attacks[((int) (Math.random() * 4))];
+                    }
+                    System.out.println("\n\n\n\n\nTESTESTESTESTESTES: Player " + players[player].getName() + " chose " + attacks[player].name);
                 }
                 else if(choice == 2){
                     substitutes[player] = getSubstitute(players[player]);
@@ -115,7 +151,6 @@ public class Main{
                     }
                 }
             }
-
             if(!gameOver){
                 //Performing substitutions
                 for(int i = 0; i <= 1; i++){
@@ -347,30 +382,54 @@ public class Main{
                 else screen[i][j] = "   ";
             }
         }
+
         //Player 1 Pokemon List
+        //Note to self: Make max length of user input 18
+        String header = "Player One:       ";
         ArrayList<String> list1 = new ArrayList<>();
         for(Pokemon x : players[0].getTeam()){
-            String tag = " (unconscious)";
-            if(x.getHp() == 0){ list1.add(x.getName() + tag); }
-            else{ list1.add(x.getName()); }
+            String name = x.getName();
+            if(x.getHp() == 0){ name += " [F]"; }
+            name += ("                  ").substring(0, 18 - name.length());
+            list1.add(name);
         }
-        int index = 0;
         for(int i = border; i < attackScreenY; i++){
             for(int j = border; j < border + 6; j++){
                 int localX = j - border;
                 int localY = i - border;
-                int start = localX * 3;
-                int end = start + 3;
-                //screen[i][j] = list1.get(localY).substring(start, end);
-                screen[i][j] = localY + "   ".substring(0, 3 - (localY + "").length());
+                int index = (localY / 2) - 3;
+                screen[i][j] = "   ";
+                if(localY == 0){ screen[i][j] = header.substring(localX * 3, (localX * 3) + 3); }
                 if(localY % 2 == 0 && localY > 5){
-                    list1.get(index);
-                    screen[i][j] = "!!!";
+                    if(index < list1.size()){ screen[i][j] = list1.get(index).substring(localX * 3, (localX * 3) + 3); }
+                    else{ screen[i][j] = "   "; }
                 }
             }
         }
         //Player 2 Pokemon List
-
+        header = "Player Two:       ";
+        if(gameplayType.equals("PVE")){ header = "Computer:         "; }
+        ArrayList<String> list2 = new ArrayList<>();
+        for(Pokemon x : players[1].getTeam()){
+            String name = x.getName();
+            if(x.getHp() == 0){ name += " [F]"; }
+            name += ("                  ").substring(0, 18 - name.length());
+            list2.add(name);
+        }
+        for(int i = border; i < attackScreenY; i++){
+            for(int j = dataScreenX - 6; j < dataScreenX; j++){
+                int localX = j - (dataScreenX - 6);
+                int localY = i - border;
+                int index = (localY / 2) - 3;
+                screen[i][j] = "   ";
+                if(localY == 0){ screen[i][j] = header.substring(localX * 3, (localX * 3) + 3); }
+                if(localY % 2 == 0 && localY > 5){
+                    if(index < list2.size()){ screen[i][j] = list2.get(index).substring(localX * 3, (localX * 3) + 3); }
+                    else{ screen[i][j] = "   "; }
+                }
+                //screen[i][j] = "XXX";
+            }
+        }
         return screen;
     }
 
@@ -447,13 +506,18 @@ public class Main{
         }
     }
 
-    public static void generateTeams(int teamSize){
+    public static void generateTeams(int team1Size, int team2Size){
         ArrayList<Pokemon> list = (ArrayList<Pokemon>) Pokemon.pokedex.clone();
-        for(int i = 0; i < teamSize * 2; i++){
+        for(int i = 0; i < team1Size; i++){
             int index = 9999;
             while(!(index < list.size())){ index = (int) (Math.random() * (list.size() + 1)); }
-            if(i < teamSize){ list.get(index).owner = 0; players[0].getTeam().add(list.get(index)); }
-            else{ list.get(index).owner = 1; players[1].getTeam().add(list.get(index)); }
+            list.get(index).owner = 0; players[0].getTeam().add(list.get(index));
+            list.remove(index);
+        }
+        for(int i = 0; i < team2Size; i++){
+            int index = 9999;
+            while(!(index < list.size())){ index = (int) (Math.random() * (list.size() + 1)); }
+            list.get(index).owner = 1; players[1].getTeam().add(list.get(index));
             list.remove(index);
         }
         players[0].currentPokemon = players[0].getTeam().get((int) (Math.random() * players[0].getTeam().size()));
