@@ -72,22 +72,13 @@ class ChangeStage extends Effect{
     @Override
     public void activate(Pokemon user, Pokemon target){
         if(stage > 0) target = user; //This assumes decreases always negative and increases always positive
-        // the obligatory switch
-        switch (stat) {
-            case "spd":
-                target.changeSpeed(stage);
-            case "atk":
-                target.changeAttack(stage);
-            case "spAtk":
-                target.changeSpecialAttack(stage);
-            case "def":
-                target.changeDefense(stage);
-            case "spDef":
-                target.changeSpecialDefense(stage);
-            case "acc":
-                target.changeAccuracy(stage);
-        }
-        String result = target.getName() + "'s " + stat + " was ";
+        if(stat.equals("spd")){ target.changeSpeed(stage); }
+        else if(stat.equals("atk")){ target.changeAttack(stage); }
+        else if(stat.equals("spAtk")){ target.changeSpecialAttack(stage); }
+        else if(stat.equals("def")){ target.changeDefense(stage); }
+        else if(stat.equals("spDef")){ target.changeSpecialDefense(stage); }
+        else if(stat.equals("acc")){ target.changeAccuracy(stage); }
+        String result = user.getName() + "'s " + stat + " was ";
         if(stage > 0) result += "increased!";
         else result += "decreased!";
         //Main.data.add(result);
@@ -105,9 +96,11 @@ class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
         this.expirationDate = 100;
         this.command = command;
         this.name = command;
+        System.out.println("POISON TEST 1");
     }
     @Override
     public void activate(Pokemon user, Pokemon target){
+        System.out.println("POISON TEST 2");
         boolean fire = false;
         boolean steelOrPoison = false;
         for(int type : target.getType()){ if(type == 1){ fire = true; break; }
@@ -117,13 +110,15 @@ class Damage extends Effect{ //Includes Leech, Burn, Poison, Bad Poison
             if(command.equals("burn")){ target.atkDmgMult = 0.5; }
             else if(command.equals("badPoison")){ denominator = 16; badPoison = true; }
             else if(command.equals("leech")){ leech = true; }
-            super.activate(user, target);
+
 
             String result = "";
             if(command.equals("poison") || command.equals("badPoison")) result = user.name + " was poisoned!";
             else if(command.equals("burn")) result = user.name + " was burned!";
             //Main.data.add(result);
             Main.addData(result);
+
+            super.activate(user, target);
         }
         else{
             //Main.data.add(target.name + " is immune to " + command + "!");
