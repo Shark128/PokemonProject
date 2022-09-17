@@ -28,12 +28,13 @@ public class Pokemon{
     public boolean confused = false;
     public ArrayList<Effect> effects = new ArrayList<>();
     public Attack[] attacks = new Attack[4];
+    public ArrayList<Item> items = new ArrayList<>();
 
     //boolean fainted = false;
     public int owner = 0;
 
     public Pokemon(String name, double hp, double spd, double atk, double spAtk, double def, double spDef,
-                   double weight, int level, int[] type){
+                   double weight, int level, int[] type, ArrayList<Item> items){
         /*
         STRUCTURE OF VARIABLES:
         Health: 0 = base, 1 = actual
@@ -58,6 +59,7 @@ public class Pokemon{
         this.weight = weight;
         this.level = level;
         this.type = type;
+        this.items = items;
     }
 
     public void update(){
@@ -185,7 +187,7 @@ public class Pokemon{
         ArrayList<Pokemon> pokedex = new ArrayList<>();
 
         Pokemon Charmander = new Pokemon("Charmander", 39, 45, 52,
-                60, 43, 50, 8.5, 10, new int[]{1});
+                60, 43, 50, 8.5, 10, new int[]{1}, new ArrayList<Item>());
         //Attacks: Ember, Smokescreen, Dragon_Breath, Slash
         Attack Ember = new Attack("Ember",40, 100, 6.5, 0, 1,
                 "Has a 10% chance to burn the target.");
@@ -201,7 +203,7 @@ public class Pokemon{
         Charmander.attacks = new Attack[]{Ember, Smokescreen, Dragon_Breath, Slash};
 
         Pokemon Squirtle = new Pokemon("Squirtle", 44, 43, 48,
-                50, 65, 64, 9, 10, new int[]{2});
+                50, 65, 64, 9, 10, new int[]{2}, new ArrayList<Item>());
         //Attacks: Water_Gun, Withdraw, Water Pulse, Protect
         Attack Water_Gun = new Attack("Water Gun", 40, 100, 6.5, 0, 2,
                 "No additional effect.");
@@ -217,7 +219,7 @@ public class Pokemon{
         Squirtle.attacks = new Attack[]{Water_Gun, Withdraw, Water_Pulse, Protect};
 
         Pokemon Pidgey = new Pokemon("Pidgey", 40, 56, 45, 35, 40, 35,
-                4, 1, new int[]{0, 9});
+                4, 1, new int[]{0, 9}, new ArrayList<Item>());
 //        Attacks: Sand Attack, Agility, Wing Attack, Gust
         Attack Sand_Attack = new Attack("Sand Attack", 0, 100, 0, 0, 9,
                 "Lowers the target's accuracy by 1 stage.");
@@ -232,7 +234,7 @@ public class Pokemon{
         Pidgey.attacks = new Attack[]{Sand_Attack,Agility,Wing_Attack,Gust};
 
         Pokemon Pichu = new Pokemon("Pichu", 20, 60, 40, 35, 15, 35,
-                4.4, 54, new int[]{4});
+                4.4, 54, new int[]{4}, new ArrayList<Item>());
 //        Attacks: Tail Whip, Thunder Shock, Nuzzle, Charm
         Attack Tail_Whip = new Attack("Tail Whip", 0, 100, 0, 0, 0,
                 "Lowers the target's Defense by 1 stage.");
@@ -249,7 +251,7 @@ public class Pokemon{
         Pichu.attacks = new Attack[]{Tail_Whip, Thunder_Shock, Nuzzle, Charm};
 
         Pokemon Diglett = new Pokemon("Diglett", 10, 95, 55, 35, 25, 45,
-                1.8, 38, new int[]{8});
+                1.8, 38, new int[]{8}, new ArrayList<Item>());
 //        Attacks: Scratch, Sucker Punch, Growl, Slash
         Attack Scratch = new Attack("Scratch", 40, 100, 6.5, 0, 0,
                 "No additional effect.");
@@ -261,7 +263,7 @@ public class Pokemon{
         Diglett.attacks = new Attack[]{Scratch, Sucker_Punch, Growl, Slash};
 
         Pokemon Gastly = new Pokemon("Gastly", 30, 80, 35, 100, 30, 35,
-                .2, 19, new int[]{7, 13});
+                .2, 19, new int[]{7, 13}, new ArrayList<Item>());
 //        Attacks: Confuse Ray, Hypnosis, Shadow Ball, Payback
         Attack Confuse_Ray = new Attack("Confuse Ray", 0, 100, 0, 0, 13,
                 "Confuses the target.");
@@ -277,7 +279,7 @@ public class Pokemon{
         Gastly.attacks = new Attack[]{Confuse_Ray, Hypnosis, Shadow_Ball, Payback};
 
         Pokemon Voltorb = new Pokemon("Voltorb", 40, 100, 30, 55, 50, 55,
-                23, 78, new int[]{4});
+                23, 78, new int[]{4}, new ArrayList<Item>());
 //        Attacks: Eerie Impulse, Spark, Charge Beam, Screech
         Attack Eerie_Impulse = new Attack("Eerie Impulse", 0, 100, 0, 0, 4,
                 "Lowers the target's Special Attack by 2 stages.");
@@ -294,7 +296,7 @@ public class Pokemon{
         Voltorb.attacks = new Attack[]{Eerie_Impulse, Spark, Charge_Beam, Screech};
 
         Pokemon Dratini = new Pokemon("Dratini", 41, 50, 64, 50, 45, 50,
-                7.3, 45, new int[]{14});
+                7.3, 45, new int[]{14}, new ArrayList<Item>());
 //        Attacks: Thunder Wave, Twister, Slam, Agility
         Attack Thunder_Wave = new Attack("Thunder Wave", 0, 90, 0, 0, 4,
                 "Paralyzes the target.");
@@ -306,7 +308,7 @@ public class Pokemon{
         Dratini.attacks = new Attack[]{Thunder_Wave, Twister, Slam, Agility};
 
         Pokemon Slowpoke = new Pokemon("Slowpoke", 90, 15, 65, 40, 65, 40,
-                79, 39, new int[]{2, 10});
+                79, 39, new int[]{2, 10}, new ArrayList<Item>());
 //       Attacks: Growl, Water Pulse, Amnesia, Confusion
         Attack Confusion = new Attack("Confusion", 50, 100, 6.5, 0, 10,
                 "Has a 10% chance to confuse the target.");
@@ -317,7 +319,7 @@ public class Pokemon{
         Slowpoke.attacks = new Attack[]{Growl, Water_Pulse, Confusion, Amnesia};
 
         Pokemon Spearow = new Pokemon("Spearow", 40, 70, 60, 31, 30, 31,
-                4.4, 52, new int[]{0, 9});
+                4.4, 52, new int[]{0, 9}, new ArrayList<Item>());
 //        Attacks: Peck, Assurance, Agility, Growl
         Attack Peck = new Attack("Peck", 35, 100, 6.5, 0, 9,
                 "No additional effect.");
@@ -326,7 +328,7 @@ public class Pokemon{
         Spearow.attacks = new Attack[]{Peck, Assurance, Agility, Growl};
 
         Pokemon Sandshrew = new Pokemon("Sandshrew", 50, 40, 75, 20, 85, 30,
-                26, 27, new int[]{8});
+                26, 27, new int[]{8}, new ArrayList<Item>());
 //        Attacks: Scratch, Poison Sting, Slash, Swords Dance
         Attack Poison_Sting = new Attack("Poison Sting", 15, 100, 6.5, 0, 7,
                 "30% chance to poison the target.");
@@ -337,7 +339,7 @@ public class Pokemon{
         Sandshrew.attacks = new Attack[]{Scratch, Poison_Sting, Slash, Swords_Dance};
 
         Pokemon Zubat = new Pokemon("Zubat", 40, 55, 45, 30, 35, 40,
-                16, 43, new int[]{7, 9});
+                16, 43, new int[]{7, 9}, new ArrayList<Item>());
 //        Attacks: Supersonic, Poison Fang, Air Cutter, Confuse Ray
         Attack Supersonic = new Attack("Supersonic", 0, 55, 0, 0, 0,
                 "Causes the target to become confused.");
@@ -350,7 +352,7 @@ public class Pokemon{
         Zubat.attacks = new Attack[]{Supersonic, Poison_Fang, Air_Cutter, Confuse_Ray};
 
         Pokemon MrBounds = new Pokemon("Mr. Bounds", 1234, 1234, 1234, 1234, 1234, 1234,
-                2000, 99, new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17});
+                2000, 99, new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}, new ArrayList<Item>());
 //        Attacks: Boundless Force
         Attack Boundless_Force = new Attack("Boundless Force", 1000, 5, 100, 5, 0,
                 "YOU CAN'T STOP THE BOUNDLESS FORCE (unless it misses)");
