@@ -72,12 +72,20 @@ class ChangeStage extends Effect{
     @Override
     public void activate(Pokemon user, Pokemon target){
         if(stage > 0) target = user; //This assumes decreases always negative and increases always positive
-        if(stat.equals("spd")){ target.changeSpeed(stage); }
-        else if(stat.equals("atk")){ target.changeAttack(stage); }
-        else if(stat.equals("spAtk")){ target.changeSpecialAttack(stage); }
-        else if(stat.equals("def")){ target.changeDefense(stage); }
-        else if(stat.equals("spDef")){ target.changeSpecialDefense(stage); }
-        else if(stat.equals("acc")){ target.changeAccuracy(stage); }
+        switch (stat) {
+            case "spd":
+                target.changeSpeed(stage);
+            case "atk":
+                target.changeAttack(stage);
+            case "spAtk":
+                target.changeSpecialAttack(stage);
+            case "def":
+                target.changeDefense(stage);
+            case "spDef":
+                target.changeSpecialDefense(stage);
+            case "acc":
+                target.changeAccuracy(stage);
+        }
         String result = user.getName() + "'s " + stat + " was ";
         if(stage > 0) result += "increased!";
         else result += "decreased!";
