@@ -2,26 +2,24 @@ import java.util.ArrayList;
 public class Pokemon{
     public static final String[] intToType = ("Normal,Fire,Water,Grass,Electric,Ice,Fighting,Poison,Ground,Flying," +
             "Psychic,Bug,Rock,Ghost,Dragon,Dark,Steel,Fairy").split(",");
-    public static ArrayList<Pokemon> pokedex = new ArrayList<>();
-    //0-Normal 1-fire 2-water 3-grass 4-electric 5-ice
-    //6-fighting 7-poison 8-ground 9-flying 10-psychic
-    //11-bug 12-rock 13-ghost 14-dragon 15-dark
-    //16-steel 17-fairy
+    public static final ArrayList<Pokemon> pokedex = getPokedex();
+    /**BASIC VARIABLES
+     * All of these are just descriptors
+     * */
     public String name;
     public double[] hp;
     public double[] spd;
-
     public double[] atk;
     public double[] spAtk;
     public double[] def;
     public double[] spDef;
     public double[] acc = new double[]{2.0, 2.0};
-
     public double weight;
     public int level;
     public int[] type;
-
-    //Effect variables
+    /**COMPLEX VARIABLES
+     *
+     * */
     public double atkDmgMult = 1;
     public int protectCounter = 1;
     public boolean canMove = true;
@@ -29,12 +27,19 @@ public class Pokemon{
     public ArrayList<Effect> effects = new ArrayList<>();
     public Attack[] attacks = new Attack[4];
     public ArrayList<Item> items = new ArrayList<>();
-
-    //boolean fainted = false;
     public int owner = 0;
-
+    /**CONSTRUCTOR
+     * The variables here are weird, but weird for a reason. This is their structure:
+     *
+     *       Health: index 0 = base, index 1 = actual
+     *
+     *       Speed to SpecialDefense: index 0 = base, index 1 = numerator of stage,
+     *       index 2 = denominator of stage, index 3 = actual
+     *
+     *       Accuracy: index 0 = numerator of stage, index 1 = denominator of stage
+     * */
     public Pokemon(String name, double hp, double spd, double atk, double spAtk, double def, double spDef,
-                   double weight, int level, int[] type, ArrayList<Item> items){
+                   double weight, int level, int[] type){
         /*
         STRUCTURE OF VARIABLES:
         Health: 0 = base, 1 = actual
@@ -59,24 +64,22 @@ public class Pokemon{
         this.weight = weight;
         this.level = level;
         this.type = type;
-        this.items = items;
     }
-
+    /**UPDATE METHOD
+     * Used to update/remove the effects acting on this pokemon
+     * */
     public void update(){
         //Removing expired effects
         for(int i = 0; i < effects.size(); i++){
-            if(effects.get(i).expirationDate == Main.turn){
-                //System.out.println(this.name + "'s " + effects.get(i).name + " expired");
-                effects.get(i).end();
-                i = -1;
-            }
+            if(effects.get(i).expirationDate == Main.turn){ effects.get(i).end(); i = -1; }
         }
-        //Using effects
+        //Updating effects
         for(Effect effect : effects){ effect.update(); }
     }
-
+    /**GETSTRING METHOD
+     * Used to get the pokemon info displayed in the graphics
+     * */
     public ArrayList<String> getString(boolean currentPokemon){
-        System.out.println("TESTESTEST HP: " + this.getHp());
         int width = 39;
         String space = "                                                                        ";
         ArrayList<String> string = new ArrayList<>();
@@ -95,10 +98,6 @@ public class Pokemon{
         String types = "Type: ";
         for(int x : this.type){ types += Pokemon.intToType[x] + " "; }
         types += space.substring(0, width).substring(0, width - types.length());
-        //System.out.println(types.length());
-        //hp1 = "";
-        //hp2 = space.replace(" ", "@").substring(0, 30);
-        //percent = 123;
 
         String hp3 = space.substring(0, width - (percent + " " + hp1 + hp2).length());
         String hp = hp1 + hp2 + hp3 + percent + "%";
@@ -109,11 +108,9 @@ public class Pokemon{
         //string.add(space.substring(0, width)); //Use this space later for effects
         return string;
     }
-
-
-
-
-    //ACCESSORS AND MUTATORS
+    /**ACCESSORS AND MUTATORS
+     * An absolutely necessary step to ensure that the Pokehackers don't steal our code
+     * */
     //Getters
     public String getName(){ return name; }
     public double getHp(){ return hp[1]; }
@@ -130,22 +127,14 @@ public class Pokemon{
     public int[] getType(){ return type; }
     public boolean getCanMove(){ return canMove; }
     //Setters
-    public void setHp(double hp){
-        this.hp[1] = hp;
-        if(hp < 0){
-            this.hp[1] = 0;
-            //this.fainted = true;
-            Main.addData(this.getName() + " fainted!");
-        }
-        //System.out.println(owner.name);
-    }
+    public void setHp(double hp){ this.hp[1] = hp; if(hp < 0){ this.hp[1] = 0; Main.addData(this.getName() + " fainted!"); } }
     public void setSpd(double spd){ this.spd[3] = spd; }
     public void setAtk(double atk){ this.atk[3] = atk; }
     public void setSpAtk(double spAtk){ this.spAtk[3] = spAtk; }
     public void setDef(double def){ this.def[3] = def; }
     public void setSpDef(double spDef){ this.spDef[3] = spDef; }
     public void setAttackDamageMultiplier(double x){ this.atkDmgMult = x; }
-    //Changers (for stage modification)
+    //Changers (exclusively for stage modification)
     public void changeSpeed(int stage){
         if(stage > 0){ if(this.spd[1] < 8){ this.spd[1]++; } }
         else{ if(this.spd[2] < 8){ this.spd[2]--; } }
@@ -182,12 +171,14 @@ public class Pokemon{
         if(stage > 0){ stage--; } else{ stage++; }
         if(stage != 0){ changeSpecialDefense(stage); }
     }
-
+    /**THE POKEDEX
+     * Contains all pokemon included in this game
+     * */
     public static ArrayList<Pokemon> getPokedex(){
         ArrayList<Pokemon> pokedex = new ArrayList<>();
 
         Pokemon Charmander = new Pokemon("Charmander", 39, 45, 52,
-                60, 43, 50, 8.5, 10, new int[]{1}, new ArrayList<Item>());
+                60, 43, 50, 8.5, 10, new int[]{1});
         //Attacks: Ember, Smokescreen, Dragon_Breath, Slash
         Attack Ember = new Attack("Ember",40, 100, 6.5, 0, 1,
                 "Has a 10% chance to burn the target.");
@@ -203,7 +194,7 @@ public class Pokemon{
         Charmander.attacks = new Attack[]{Ember, Smokescreen, Dragon_Breath, Slash};
 
         Pokemon Squirtle = new Pokemon("Squirtle", 44, 43, 48,
-                50, 65, 64, 9, 10, new int[]{2}, new ArrayList<Item>());
+                50, 65, 64, 9, 10, new int[]{2});
         //Attacks: Water_Gun, Withdraw, Water Pulse, Protect
         Attack Water_Gun = new Attack("Water Gun", 40, 100, 6.5, 0, 2,
                 "No additional effect.");
@@ -219,7 +210,7 @@ public class Pokemon{
         Squirtle.attacks = new Attack[]{Water_Gun, Withdraw, Water_Pulse, Protect};
 
         Pokemon Pidgey = new Pokemon("Pidgey", 40, 56, 45, 35, 40, 35,
-                4, 1, new int[]{0, 9}, new ArrayList<Item>());
+                4, 1, new int[]{0, 9});
 //        Attacks: Sand Attack, Agility, Wing Attack, Gust
         Attack Sand_Attack = new Attack("Sand Attack", 0, 100, 0, 0, 9,
                 "Lowers the target's accuracy by 1 stage.");
@@ -234,7 +225,7 @@ public class Pokemon{
         Pidgey.attacks = new Attack[]{Sand_Attack,Agility,Wing_Attack,Gust};
 
         Pokemon Pichu = new Pokemon("Pichu", 20, 60, 40, 35, 15, 35,
-                4.4, 54, new int[]{4}, new ArrayList<Item>());
+                4.4, 54, new int[]{4});
 //        Attacks: Tail Whip, Thunder Shock, Nuzzle, Charm
         Attack Tail_Whip = new Attack("Tail Whip", 0, 100, 0, 0, 0,
                 "Lowers the target's Defense by 1 stage.");
@@ -251,7 +242,7 @@ public class Pokemon{
         Pichu.attacks = new Attack[]{Tail_Whip, Thunder_Shock, Nuzzle, Charm};
 
         Pokemon Diglett = new Pokemon("Diglett", 10, 95, 55, 35, 25, 45,
-                1.8, 38, new int[]{8}, new ArrayList<Item>());
+                1.8, 38, new int[]{8});
 //        Attacks: Scratch, Sucker Punch, Growl, Slash
         Attack Scratch = new Attack("Scratch", 40, 100, 6.5, 0, 0,
                 "No additional effect.");
@@ -263,7 +254,7 @@ public class Pokemon{
         Diglett.attacks = new Attack[]{Scratch, Sucker_Punch, Growl, Slash};
 
         Pokemon Gastly = new Pokemon("Gastly", 30, 80, 35, 100, 30, 35,
-                .2, 19, new int[]{7, 13}, new ArrayList<Item>());
+                .2, 19, new int[]{7, 13});
 //        Attacks: Confuse Ray, Hypnosis, Shadow Ball, Payback
         Attack Confuse_Ray = new Attack("Confuse Ray", 0, 100, 0, 0, 13,
                 "Confuses the target.");
@@ -279,7 +270,7 @@ public class Pokemon{
         Gastly.attacks = new Attack[]{Confuse_Ray, Hypnosis, Shadow_Ball, Payback};
 
         Pokemon Voltorb = new Pokemon("Voltorb", 40, 100, 30, 55, 50, 55,
-                23, 78, new int[]{4}, new ArrayList<Item>());
+                23, 78, new int[]{4});
 //        Attacks: Eerie Impulse, Spark, Charge Beam, Screech
         Attack Eerie_Impulse = new Attack("Eerie Impulse", 0, 100, 0, 0, 4,
                 "Lowers the target's Special Attack by 2 stages.");
@@ -296,7 +287,7 @@ public class Pokemon{
         Voltorb.attacks = new Attack[]{Eerie_Impulse, Spark, Charge_Beam, Screech};
 
         Pokemon Dratini = new Pokemon("Dratini", 41, 50, 64, 50, 45, 50,
-                7.3, 45, new int[]{14}, new ArrayList<Item>());
+                7.3, 45, new int[]{14});
 //        Attacks: Thunder Wave, Twister, Slam, Agility
         Attack Thunder_Wave = new Attack("Thunder Wave", 0, 90, 0, 0, 4,
                 "Paralyzes the target.");
@@ -308,7 +299,7 @@ public class Pokemon{
         Dratini.attacks = new Attack[]{Thunder_Wave, Twister, Slam, Agility};
 
         Pokemon Slowpoke = new Pokemon("Slowpoke", 90, 15, 65, 40, 65, 40,
-                79, 39, new int[]{2, 10}, new ArrayList<Item>());
+                79, 39, new int[]{2, 10});
 //       Attacks: Growl, Water Pulse, Amnesia, Confusion
         Attack Confusion = new Attack("Confusion", 50, 100, 6.5, 0, 10,
                 "Has a 10% chance to confuse the target.");
@@ -319,7 +310,7 @@ public class Pokemon{
         Slowpoke.attacks = new Attack[]{Growl, Water_Pulse, Confusion, Amnesia};
 
         Pokemon Spearow = new Pokemon("Spearow", 40, 70, 60, 31, 30, 31,
-                4.4, 52, new int[]{0, 9}, new ArrayList<Item>());
+                4.4, 52, new int[]{0, 9});
 //        Attacks: Peck, Assurance, Agility, Growl
         Attack Peck = new Attack("Peck", 35, 100, 6.5, 0, 9,
                 "No additional effect.");
@@ -328,7 +319,7 @@ public class Pokemon{
         Spearow.attacks = new Attack[]{Peck, Assurance, Agility, Growl};
 
         Pokemon Sandshrew = new Pokemon("Sandshrew", 50, 40, 75, 20, 85, 30,
-                26, 27, new int[]{8}, new ArrayList<Item>());
+                26, 27, new int[]{8});
 //        Attacks: Scratch, Poison Sting, Slash, Swords Dance
         Attack Poison_Sting = new Attack("Poison Sting", 15, 100, 6.5, 0, 7,
                 "30% chance to poison the target.");
@@ -339,7 +330,7 @@ public class Pokemon{
         Sandshrew.attacks = new Attack[]{Scratch, Poison_Sting, Slash, Swords_Dance};
 
         Pokemon Zubat = new Pokemon("Zubat", 40, 55, 45, 30, 35, 40,
-                16, 43, new int[]{7, 9}, new ArrayList<Item>());
+                16, 43, new int[]{7, 9});
 //        Attacks: Supersonic, Poison Fang, Air Cutter, Confuse Ray
         Attack Supersonic = new Attack("Supersonic", 0, 55, 0, 0, 0,
                 "Causes the target to become confused.");
@@ -352,7 +343,7 @@ public class Pokemon{
         Zubat.attacks = new Attack[]{Supersonic, Poison_Fang, Air_Cutter, Confuse_Ray};
 
         Pokemon MrBounds = new Pokemon("Mr. Bounds", 1234, 1234, 1234, 1234, 1234, 1234,
-                2000, 99, new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17}, new ArrayList<Item>());
+                2000, 99, new int[]{0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17});
 //        Attacks: Boundless Force
         Attack Boundless_Force = new Attack("Boundless Force", 1000, 5, 100, 5, 0,
                 "YOU CAN'T STOP THE BOUNDLESS FORCE (unless it misses)");
@@ -370,15 +361,10 @@ public class Pokemon{
         pokedex.add(Spearow);
         pokedex.add(Sandshrew);
         pokedex.add(Zubat);
-        //pokedex.add(MrBounds);
 
-        //Temporary measure to set type2s
-        for(Pokemon x : pokedex){
-            for(Attack y : x.attacks){
-                y.initializeType2();
-                //System.out.println("Initialized " + y.name + " to " + y.type2);
-            }
-        }
+        //pokedex.add(MrBounds);
+        //Initializing type2s of all attacks
+        for(Pokemon x : pokedex){ for(Attack y : x.attacks){ y.initializeType2(); } }
         return pokedex;
     }
 }
