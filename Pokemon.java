@@ -90,22 +90,18 @@ public class Pokemon{
         //HP string
         int percent = (int) ((100.0 * this.getHp()) / this.getBaseHp());
         int actualHp = (int) ((30 * this.getHp()) / this.getBaseHp());
-        String hp1 = (space.substring(0, 30).replace(" ", "+")).substring(0, actualHp);
+        String hp1 = (space.substring(0, 30).replace(" ", "@")).substring(0, actualHp);
         String hp2 = (space.substring(0, 30).replace(" ", "-")).substring(0, 30 - actualHp);
-        //Fixing a rounding thing that affects graphics
-        if(percent > 99.9){ hp1 = space.substring(0, 30).replace(" ", "+"); hp2 = ""; }
         //Type string
         String types = "Type: ";
         for(int x : this.type){ types += Pokemon.intToType[x] + " "; }
         types += space.substring(0, width).substring(0, width - types.length());
-
         String hp3 = space.substring(0, width - (percent + " " + hp1 + hp2).length());
         String hp = hp1 + hp2 + hp3 + percent + "%";
         if(!currentPokemon) hp = percent + "%" + hp3 + hp2 + hp1;
         string.add(title);
         string.add(hp);
         string.add(types);
-        //string.add(space.substring(0, width)); //Use this space later for effects
         return string;
     }
     /**ACCESSORS AND MUTATORS
@@ -348,7 +344,6 @@ public class Pokemon{
         Attack Boundless_Force = new Attack("Boundless Force", 1000, 5, 100, 5, 0,
                 "YOU CAN'T STOP THE BOUNDLESS FORCE (unless it misses)");
         Boundless_Force.addEffect(100, new ChangeStage("acc", 2));
-
         pokedex.add(Charmander);
         pokedex.add(Squirtle);
         pokedex.add(Pidgey);
@@ -361,7 +356,6 @@ public class Pokemon{
         pokedex.add(Spearow);
         pokedex.add(Sandshrew);
         pokedex.add(Zubat);
-
         //pokedex.add(MrBounds);
         //Initializing type2s of all attacks
         for(Pokemon x : pokedex){ for(Attack y : x.attacks){ y.initializeType2(); } }
